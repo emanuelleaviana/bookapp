@@ -1,6 +1,3 @@
-import 'package:bookapp/app/data/http/http_client.dart';
-import 'package:bookapp/app/data/repositories/book_repository.dart';
-import 'package:bookapp/src/home/stores/book_stores.dart';
 import 'package:flutter/material.dart';
 import 'add_modal.dart';
 import 'delete_modal.dart';
@@ -37,10 +34,6 @@ void _openModalEdit(BuildContext context) {
 }
 
 class CustomCard extends StatelessWidget {
-  final BookStore store;
-
-  CustomCard({required this.store});
-
   @override
   Widget build(BuildContext context) {
     return Card(

@@ -1,6 +1,3 @@
-import 'package:bookapp/app/data/http/http_client.dart';
-import 'package:bookapp/app/data/repositories/book_repository.dart';
-import 'package:bookapp/src/home/stores/book_stores.dart';
 import 'package:flutter/material.dart';
 import 'add_modal.dart';
 import 'custom_card.dart';
@@ -14,12 +11,6 @@ void _openModalAdd(BuildContext context) {
     },
   );
 }
-
-BookStore store = BookStore(
-  repository: BookRepository(
-    client: HttpClient(),
-  ),
-);
 
 class ListScreen extends StatelessWidget {
   const ListScreen({super.key});
@@ -69,7 +60,7 @@ class ListScreen extends StatelessWidget {
                     ),
                     color: const Color(0xFFF78376),
                     child: Column(children: <Widget>[
-                      CustomCard(store: store,),
+                      CustomCard(),
 
                       FloatingActionButton(
                         backgroundColor: const Color(0xFF3F3557),

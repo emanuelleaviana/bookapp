@@ -1,21 +1,35 @@
-class BookModel {
-  final String tittle;
-  final String author;
-  final String description;
-  final double id;
+import 'dart:convert';
 
-  BookModel({
-    required this.tittle,
-    required this.author,
-    required this.description,
-    required this.id,
+List<Book> bookFromJson(String str) =>
+    List<Book>.from(json.decode(str).map((x) => Book.fromJson(x)));
+
+String bookToJson(List<Book> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
+class Book {
+  Book({
+    this.id,
+    this.author,
+    this.description,
+    this.title,
   });
 
-  factory BookModel.fromMap(item, {required Map<String, dynamic> map}) {
-    return BookModel(
-        tittle: map['tittle'],
-        author: map['author'],
-        description: map['description'],
-        id: map['id']);
-  }
+  String? id;
+  String? author;
+  String? description;
+  String? title;
+
+  factory Book.fromJson(Map<String, dynamic> json) => Book(
+        id: json["id"].toString(),
+        author: json["author"],
+        description: json["description"],
+        title: json["title"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "author": author,
+        "description": description,
+        "title": title,
+      };
 }
