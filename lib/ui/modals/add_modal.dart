@@ -1,8 +1,8 @@
-import 'package:bookapp/app/data/repositories/book_repository.dart';
+import 'package:bookapp/data/repositories/book_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../app/data/models/book_model.dart';
+import '../../data/models/book_model.dart';
 
 class AddModal extends StatefulWidget {
   @override
@@ -34,6 +34,8 @@ class _AddModalState extends State<AddModal> {
           _idController.text.isNotEmpty;
     });
   }
+
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +94,7 @@ class _AddModalState extends State<AddModal> {
                         labelText: 'Descrição',
                         labelStyle: TextStyle(color: Colors.white),
                       ),
+                      maxLines: null,
                       onChanged: (_) => _checkFieldsFilled(),
                     ),
                     TextFormField(
@@ -102,10 +105,7 @@ class _AddModalState extends State<AddModal> {
                         labelStyle: TextStyle(color: Colors.white),
                       ),
                       onChanged: (_) => _checkFieldsFilled(),
-                      inputFormatters: [
-                        FilteringTextInputFormatter
-                            .digitsOnly 
-                      ],
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                   ],
                 ),
@@ -114,9 +114,12 @@ class _AddModalState extends State<AddModal> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _areAllFieldsFilled
+                  onPressed: _areAllFieldsFilled && !_isLoading
                       ? () async {
-                          // Se todos os campos estiverem preenchidos, continue com a ação
+                          setState(() {
+                            _isLoading = true;
+                          });
+
                           var book = Book(
                             id: _idController.text,
                             title: _titleController.text,
@@ -126,17 +129,30 @@ class _AddModalState extends State<AddModal> {
                           var response = await BookRepository()
                               .post('/Books', book)
                               .catchError((err) {});
-                          if (response == null) return;
-                          debugPrint('successful:');
-
+                          if (response == null) {
+                            setState(() {
+                              _isLoading = false;
+                            });
+                            return;
+                          }
+                          // ignore: use_build_context_synchronously
                           Navigator.pop(context);
                         }
-                      : null, // Desative o botão se nem todos os campos estiverem preenchidos
+                      : null,
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(
                         const Color(0xFFDA4C66)),
                   ),
-                  child: const Text('Confirmar'),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text('Confirmar'),
                 ),
               ),
             ],

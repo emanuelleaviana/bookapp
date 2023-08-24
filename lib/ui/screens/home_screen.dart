@@ -1,6 +1,6 @@
-import 'package:bookapp/app/data/models/book_model.dart';
-import 'package:bookapp/app/data/repositories/book_repository.dart';
-import 'package:bookapp/src/home/list_screen.dart';
+import 'package:bookapp/data/models/book_model.dart';
+import 'package:bookapp/data/repositories/book_repository.dart';
+import 'package:bookapp/ui/screens/list_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,7 +12,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool isLoading = false; // Adicione essa variável
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -86,8 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         });
                         return;
                       }
-                      debugPrint('successful:');
-
                       var books = bookFromJson(response);
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).push(MaterialPageRoute(
@@ -95,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ));
 
                       setState(() {
-                        isLoading = false; // Desativa o indicador de loading
+                        isLoading = false; 
                       });
                     },
                     child: isLoading

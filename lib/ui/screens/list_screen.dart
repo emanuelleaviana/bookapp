@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:bookapp/app/data/models/book_model.dart';
-import 'add_modal.dart';
-import 'custom_card.dart';
+import 'package:bookapp/data/models/book_model.dart';
+import '../modals/add_modal.dart';
+import '../modals/custom_card.dart';
 
 void _openModalAdd(BuildContext context) {
   showModalBottomSheet(

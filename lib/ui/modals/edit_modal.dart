@@ -1,5 +1,5 @@
-import 'package:bookapp/app/data/models/book_model.dart';
-import 'package:bookapp/app/data/repositories/book_repository.dart';
+import 'package:bookapp/data/models/book_model.dart';
+import 'package:bookapp/data/repositories/book_repository.dart';
 import 'package:flutter/material.dart';
 
 class EditModal extends StatefulWidget {
@@ -40,6 +40,8 @@ class _EditModalState extends State<EditModal> {
     _descriptionController.dispose();
     super.dispose();
   }
+
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -91,11 +93,12 @@ class _EditModalState extends State<EditModal> {
                     ),
                     TextFormField(
                       controller: _descriptionController,
-                       style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         labelText: 'Descrição',
                         labelStyle: TextStyle(color: Colors.white),
                       ),
+                      maxLines: null,
                     ),
                   ],
                 ),
@@ -104,35 +107,52 @@ class _EditModalState extends State<EditModal> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    var updatedTitle =
-                        _titleController.text; // Valor atualizado do título
-                    var updatedAuthor =
-                        _authorController.text; // Valor atualizado do autor
-                    var updatedDescription = _descriptionController
-                        .text; // Valor atualizado da descrição
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                          setState(() {
+                            _isLoading = true;
+                          });
 
-                    var updatedBook = Book(
-                      id: widget.id,
-                      title: updatedTitle,
-                      author: updatedAuthor,
-                      description: updatedDescription,
-                    );
+                          var updatedTitle = _titleController.text;
+                          var updatedAuthor = _authorController.text;
+                          var updatedDescription = _descriptionController.text;
 
-                    var response = await BookRepository()
-                        .put('/Books?id=${widget.id}', updatedBook)
-                        .catchError((err) {});
+                          var updatedBook = Book(
+                            id: widget.id,
+                            title: updatedTitle,
+                            author: updatedAuthor,
+                            description: updatedDescription,
+                          );
 
-                    if (response == null) return;
-                    debugPrint('successful:');
+                          var response = await BookRepository()
+                              .put('/Books?id=${widget.id}', updatedBook)
+                              .catchError((err) {});
 
-                    Navigator.pop(context);
-                  },
+                          if (response == null) {
+                            setState(() {
+                              _isLoading = false;
+                            });
+                            return;
+                          }
+                          // ignore: use_build_context_synchronously
+                          Navigator.pop(context);
+                        },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color(0xFFDA4C66)),
+                      const Color(0xFFDA4C66),
+                    ),
                   ),
-                  child: const Text('Confirmar'),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text('Confirmar'),
                 ),
               ),
             ],
