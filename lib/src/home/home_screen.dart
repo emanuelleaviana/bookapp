@@ -3,8 +3,16 @@ import 'package:bookapp/app/data/repositories/book_repository.dart';
 import 'package:bookapp/src/home/list_screen.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool isLoading = false; // Adicione essa variável
 
   @override
   Widget build(BuildContext context) {
@@ -58,34 +66,52 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               SizedBox(
-                height: 64,
-                width: double.infinity,
-                child: ElevatedButton(
+                  height: 64,
+                  width: double.infinity,
+                  child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFDA4C66),
                     ),
-                    child: const Text(
-                      'Começar',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 28,
-                      ),
-                    ),
                     onPressed: () async {
+                      setState(() {
+                        isLoading = true;
+                      });
+
                       var response = await BookRepository()
                           .get('/Books')
                           .catchError((err) {});
-                      if (response == null) return;
+                      if (response == null) {
+                        setState(() {
+                          isLoading = false;
+                        });
+                        return;
+                      }
                       debugPrint('successful:');
 
                       var books = bookFromJson(response);
-                      debugPrint('Books account:' + books.length.toString());
-
+                      // ignore: use_build_context_synchronously
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const ListScreen()));
-                    }),
-              ),
+                        builder: (context) => ListScreen(books: books),
+                      ));
+
+                      setState(() {
+                        isLoading = false; // Desativa o indicador de loading
+                      });
+                    },
+                    child: isLoading
+                        ? const CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          )
+                        : const Text(
+                            'Começar',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 28,
+                            ),
+                          ),
+                  )),
             ])));
   }
 }

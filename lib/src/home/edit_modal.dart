@@ -1,70 +1,142 @@
+import 'package:bookapp/app/data/models/book_model.dart';
+import 'package:bookapp/app/data/repositories/book_repository.dart';
 import 'package:flutter/material.dart';
 
-class EditModal extends StatelessWidget {
+class EditModal extends StatefulWidget {
+  final String id;
+  final String initialTitle;
+  final String initialAuthor;
+  final String initialDescription;
+
+  const EditModal({
+    required this.id,
+    required this.initialTitle,
+    required this.initialAuthor,
+    required this.initialDescription,
+  });
+
+  @override
+  _EditModalState createState() => _EditModalState();
+}
+
+class _EditModalState extends State<EditModal> {
+  late TextEditingController _titleController;
+  late TextEditingController _authorController;
+  late TextEditingController _descriptionController;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.initialTitle);
+    _authorController = TextEditingController(text: widget.initialAuthor);
+    _descriptionController =
+        TextEditingController(text: widget.initialDescription);
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _authorController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(
-        top: 30,
-        left: 40,
-        right: 40,
-        bottom: 10,
-      ),
-      color: const Color(0xFF8F3C68),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const Text(
-            'Edite as informações do seu livro!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+        padding: const EdgeInsets.only(
+          top: 30,
+          left: 40,
+          right: 40,
+          bottom: 10,
+        ),
+        color: const Color(0xFF8F3C68),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            bottom:
+                MediaQuery.of(context).viewInsets.bottom + 10, // Adicione isso
           ),
-          const SizedBox(height: 20),
-          Form(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Título',
-                    labelStyle: TextStyle(color: Colors.white),
-                  ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Text(
+                'Edite as informações do seu livro!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Autor',
-                    labelStyle: TextStyle(color: Colors.white),
-                  ),
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Descrição',
-                    labelStyle: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all<Color>(const Color(0xFFDA4C66)),
               ),
-              child: const Text('Confirmar'),
-            ),
+              const SizedBox(height: 20),
+              Form(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextFormField(
+                      controller: _titleController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: 'Título',
+                        labelStyle: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _authorController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: 'Autor',
+                        labelStyle: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _descriptionController,
+                       style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: 'Descrição',
+                        labelStyle: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    var updatedTitle =
+                        _titleController.text; // Valor atualizado do título
+                    var updatedAuthor =
+                        _authorController.text; // Valor atualizado do autor
+                    var updatedDescription = _descriptionController
+                        .text; // Valor atualizado da descrição
+
+                    var updatedBook = Book(
+                      id: widget.id,
+                      title: updatedTitle,
+                      author: updatedAuthor,
+                      description: updatedDescription,
+                    );
+
+                    var response = await BookRepository()
+                        .put('/Books?id=${widget.id}', updatedBook)
+                        .catchError((err) {});
+
+                    if (response == null) return;
+                    debugPrint('successful:');
+
+                    Navigator.pop(context);
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color(0xFFDA4C66)),
+                  ),
+                  child: const Text('Confirmar'),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 }

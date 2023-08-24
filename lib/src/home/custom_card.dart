@@ -13,50 +13,70 @@ void _openModalAdd(BuildContext context) {
   );
 }
 
-void _openModalDelete(BuildContext context) {
+void _openModalDelete(BuildContext context, id) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     builder: (BuildContext context) {
-      return DeleteModal();
+      return DeleteModal(cardId: id);
     },
   );
 }
 
-void _openModalEdit(BuildContext context) {
+void _openModalEdit(BuildContext context, id, String title,
+    String author, String description) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     builder: (BuildContext context) {
-      return EditModal();
+      return EditModal(
+        id: id,
+        initialTitle: title,
+        initialAuthor: author,
+        initialDescription: description,
+      );
     },
   );
 }
 
 class CustomCard extends StatelessWidget {
+  final String id;
+  final String title;
+  final String author;
+  final String description;
+
+  const CustomCard({
+    required this.id,
+    required this.title,
+    required this.author,
+    required this.description,
+    Key? key,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Card(
       color: const Color(0xFF3F3557),
       child: Column(
         children: <Widget>[
-          const ListTile(
+          ListTile(
             title: Text(
-              'Dom Casmurro',
-              style: TextStyle(
-                fontSize: 20, // Tamanho do título
+              title,
+              style: const TextStyle(
+                fontSize: 20,
               ),
             ),
-            subtitle: Text('Hergé'),
+            subtitle: Text(author),
             textColor: Colors.white,
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              'Um dos grandes clássicos da literatura brasileira conta a história de Bentinho e Capitu, um casal que se conhece na adolescencia...',
-              style: TextStyle(
+              description,
+              style: const TextStyle(
                 color: Colors.white,
               ),
+              textAlign: TextAlign.left,
             ),
           ),
           Row(
@@ -65,8 +85,7 @@ class CustomCard extends StatelessWidget {
               Flexible(
                 child: GestureDetector(
                   onTap: () {
-                    _openModalDelete(
-                        context); // Chama a função para abrir o modal
+                    _openModalDelete(context, int.parse(id));
                   },
                   child: Container(
                     margin: const EdgeInsets.only(top: 10),
@@ -88,7 +107,13 @@ class CustomCard extends StatelessWidget {
               Flexible(
                 child: GestureDetector(
                   onTap: () {
-                    _openModalEdit(context);
+                    _openModalEdit(
+                      context,
+                      id,
+                      title,
+                      author,
+                      description,
+                    );
                   },
                   child: Container(
                     margin: const EdgeInsets.only(top: 10),
