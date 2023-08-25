@@ -1,3 +1,4 @@
+import 'package:bookapp/data/repositories/book_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:bookapp/data/models/book_model.dart';
 import '../modals/add_modal.dart';
@@ -13,10 +14,38 @@ void _openModalAdd(BuildContext context) {
   );
 }
 
-class ListScreen extends StatelessWidget {
-  final List<Book> books;
+class ListScreen extends StatefulWidget {
+  List<Book> books;
 
-  const ListScreen({required this.books, Key? key}) : super(key: key);
+  ListScreen({required this.books, Key? key}) : super(key: key);
+
+  @override
+  _ListScreenState createState() => _ListScreenState();
+}
+
+class _ListScreenState extends State<ListScreen> {
+  bool isLoading = false;
+
+  Future<void> _handleRefresh() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      var response = await BookRepository().get('/Books');
+      if (response != null) {
+        setState(() {
+          widget.books = bookFromJson(response);
+        });
+      }
+    } catch (error) {
+      debugPrint('Erro ao buscar livros: $error');
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,50 +81,53 @@ class ListScreen extends StatelessWidget {
           bottom: 10,
         ),
         color: const Color(0xFFF3B578),
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: Container(
-                color: const Color(0xFFF78376),
-                child: ListView.builder(
-                  itemCount: books.length,
-                  itemBuilder: (context, index) {
-                    final book = books[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 5.0,
-                        horizontal: 25.0,
-                      ),
-                      child: CustomCard(
-                        id: book.id!,
-                        title: book.title!,
-                        author: book.author!,
-                        description: book.description!,
-                      ),
-                    );
-                  },
+        child: RefreshIndicator(
+          onRefresh: _handleRefresh, // Defina a função de atualização
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  color: const Color(0xFFF78376),
+                  child: ListView.builder(
+                    itemCount: widget.books.length,
+                    itemBuilder: (context, index) {
+                      final book = widget.books[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 5.0,
+                          horizontal: 25.0,
+                        ),
+                        child: CustomCard(
+                          id: book.id!,
+                          title: book.title!,
+                          author: book.author!,
+                          description: book.description!,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8F3C68),
-                minimumSize: const Size(
-                    double.infinity, 48), // Largura total e altura de 48
-              ),
-              onPressed: () {
-                _openModalAdd(context);
-              },
-              child: const Text(
-                'Adicionar livro +',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
+              const SizedBox(height: 12),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF8F3C68),
+                  minimumSize: const Size(
+                      double.infinity, 48), // Largura total e altura de 48
+                ),
+                onPressed: () {
+                  _openModalAdd(context);
+                },
+                child: const Text(
+                  'Adicionar livro +',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
                 ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );
