@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ));
 
                       setState(() {
-                        isLoading = false; 
+                        isLoading = false;
                       });
                     },
                     child: isLoading

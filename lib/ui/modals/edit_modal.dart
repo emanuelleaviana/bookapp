@@ -55,8 +55,7 @@ class _EditModalState extends State<EditModal> {
         color: const Color(0xFF8F3C68),
         child: SingleChildScrollView(
           padding: EdgeInsets.only(
-            bottom:
-                MediaQuery.of(context).viewInsets.bottom + 10, // Adicione isso
+            bottom: MediaQuery.of(context).viewInsets.bottom + 10,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

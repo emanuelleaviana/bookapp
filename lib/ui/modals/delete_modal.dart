@@ -48,8 +48,7 @@ class _DeleteModalState extends State<DeleteModal> {
                         });
 
                         var response = await BookRepository()
-                            .delete(
-                                '/Books/${widget.cardId}') // Access cardId through widget
+                            .delete('/Books/${widget.cardId}')
                             .catchError((err) {});
 
                         if (response == null) {
@@ -87,7 +86,7 @@ class _DeleteModalState extends State<DeleteModal> {
                       },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all<Color>(
-                     const Color(0xFFDA4C66),
+                    const Color(0xFFDA4C66),
                   ),
                 ),
                 child: const Text('Cancelar'),

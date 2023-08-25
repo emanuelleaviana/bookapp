@@ -82,7 +82,7 @@ class _ListScreenState extends State<ListScreen> {
         ),
         color: const Color(0xFFF3B578),
         child: RefreshIndicator(
-          onRefresh: _handleRefresh, // Defina a função de atualização
+          onRefresh: _handleRefresh,
           child: Column(
             children: <Widget>[
               Expanded(
@@ -112,8 +112,7 @@ class _ListScreenState extends State<ListScreen> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF8F3C68),
-                  minimumSize: const Size(
-                      double.infinity, 48), // Largura total e altura de 48
+                  minimumSize: const Size(double.infinity, 48),
                 ),
                 onPressed: () {
                   _openModalAdd(context);
